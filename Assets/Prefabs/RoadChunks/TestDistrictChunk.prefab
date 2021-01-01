@@ -222,6 +222,7 @@ MonoBehaviour:
   Right: {fileID: 1722073026245553751}
   Left: {fileID: 5163492110630935134}
   kind: 2
+  districtNum: 10000000
 --- !u!50 &2578836632259544329
 Rigidbody2D:
   serializedVersion: 4

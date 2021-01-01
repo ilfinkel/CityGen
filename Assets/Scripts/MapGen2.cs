@@ -130,7 +130,7 @@ public class MapGen2 : MonoBehaviour
     private IEnumerator WaitFor(float waitTime, Vector3 _pos, Quaternion _rot, RectTransform rt, Vector3 localScale)
     {
         yield return new WaitForSecondsRealtime(waitTime);
-        var rChunk = chooseRiverChunk();
+        var rChunk = ChooseRiverChunk();
 
         GenerateRiverTile(_pos, _rot, rt, 15, localScale);
 
@@ -138,7 +138,7 @@ public class MapGen2 : MonoBehaviour
         if (b > 95)
         {
             riverChunk rChunk2;
-            rChunk2 = chooseRiverChunk();
+            rChunk2 = ChooseRiverChunk();
             yield return new WaitForSecondsRealtime(waitTime);
             riverCounter++;
             GenerateRiverTile(_pos, _rot, rt, 15, localScale);
@@ -161,10 +161,10 @@ public class MapGen2 : MonoBehaviour
         var rChunk = Instantiate(newRiverChunk, _pos, _rot, Map.transform);
         spawnedRiverChunks.Add(rChunk);
 
-        if (!checkRiverChunk(rChunk))
+        if (!CheckRiverChunk(rChunk))
         {
             riverCounter--;
-            if (riverCounter == 0) spawnRiverOrRoad();
+            if (riverCounter == 0) SpawnRiverOrRoad();
             return;
         }
 
@@ -184,7 +184,7 @@ public class MapGen2 : MonoBehaviour
                 startingPoints.Add(new StartPointClass2(newRiverChunk.Left.position, 1, newRiverChunk.Left.rotation,
                     1f));
 
-                createCustomMapSimpleUnit(newRiverChunk.Right.position, newRiverChunk.Left.position, roadChunks[0], 2f);
+                CreateCustomMapSimpleUnit(newRiverChunk.Right.position, newRiverChunk.Left.position, roadChunks[0], 2f);
             }
         }
 
@@ -200,32 +200,32 @@ public class MapGen2 : MonoBehaviour
         if (_pos.x < 0 || _pos.y < 0 || _pos.x > width || _pos.y > height)
         {
             riverCounter--;
-            if (riverCounter == 0) spawnRiverOrRoad();
+            if (riverCounter == 0) SpawnRiverOrRoad();
             return;
         }
 
         GenerateRiver(_pos, _rot, rt, localScale);
     }
 
-    private riverChunk chooseRiverChunk()
+    private riverChunk ChooseRiverChunk()
     {
         var newRiverChunk = riverChunks[0];
         return newRiverChunk;
     }
 
-    private bool checkRiverChunk(riverChunk rChunk)
+    private bool CheckRiverChunk(riverChunk rChunk)
     {
         var hit = Physics2D.Raycast(rChunk.End.position, rChunk.End.up);
         if (hit.distance > 0.15f * riverUnit && hit.distance < 1.25f * riverUnit && hit.transform.tag == "river")
         {
-            createCustomMapSimpleUnit(rChunk.End.position, hit.point, riverChunks[1], 1f);
+            CreateCustomMapSimpleUnit(rChunk.End.position, hit.point, riverChunks[1], 1f);
             return false;
         }
 
         return true;
     }
 
-    private void spawnRiverOrRoad()
+    private void SpawnRiverOrRoad()
     {
         //if (spawnedRiverChunks.Count < ((width + height) / riverUnit) * 2)
         //{
@@ -240,12 +240,12 @@ public class MapGen2 : MonoBehaviour
         //}
         //else
         //{
-        spawnRoad();
+        SpawnRoad();
         //}
     }
 
     //=================================================
-    private void spawnRoad()
+    private void SpawnRoad()
     {
         var rt = (RectTransform)Map.transform;
         var xMap = Map.transform.position.x;
@@ -265,7 +265,7 @@ public class MapGen2 : MonoBehaviour
             var xPlace = Random.Range(width * (1 / xPoints), width * ((xPoints - 1) / xPoints));
             var yPlace = Random.Range(height * (1 / yPoints), height * ((yPoints - 1) / yPoints));
             RoadBeg = new Vector3(xPlace, yPlace);
-            while (checkStartingPointsToThis(RoadBeg))
+            while (CheckStartingPointsToThis(RoadBeg))
             {
                 xPlace = Random.Range(Convert.ToSingle(quarterDistance1), Convert.ToSingle(width - quarterDistance1));
                 yPlace = Random.Range(Convert.ToSingle(quarterDistance1), Convert.ToSingle(height - quarterDistance1));
@@ -302,7 +302,7 @@ public class MapGen2 : MonoBehaviour
 
                 q = Quaternion.AngleAxis(angle, Vector3.forward);
                 float magn = (otherPoints[i].position - startPoint.position).magnitude;
-                if (checkDistance(startPoint.position, q * Quaternion.Euler(0, 0, -90) * Vector3.up, magn) != true)
+                if (CheckDistance(startPoint.position, q * Quaternion.Euler(0, 0, -90) * Vector3.up, magn) != true)
                 {
                     continue;
                 }
@@ -319,7 +319,7 @@ public class MapGen2 : MonoBehaviour
             }
         }
 
-        StartPointClass2 startPoint1 = findNearestStartingPoint(new Vector3(width / 2, height / 2), true);
+        StartPointClass2 startPoint1 = FindNearestStartingPoint(new Vector3(width / 2, height / 2), true);
         startPoint1.kind = 5;
         startPoint1.sizeKoeff = 2;
 
@@ -357,13 +357,13 @@ public class MapGen2 : MonoBehaviour
     {
         var _isThatEnd = false;
         string endReason = "";
-        if (!checkStartingPointsToThis(_pos)) { _isThatEnd = true; endReason = "end"; }
+        if (!CheckStartingPointsToThis(_pos)) { _isThatEnd = true; endReason = "end"; }
 
         var newRoadChunk = roadChunks[0];
         newRoadChunk.name = "street" + _street.Name + " - " + (_street.RoadChunks.Count + 1);
 
         var rChunk = Instantiate(newRoadChunk, _pos, _rot, Map.transform);
-        rChunk.RegionColor(checkStartingPoints(_pos));
+        rChunk.RegionColor(CheckStartingPoints(_pos));
         rChunk.ended = endReason;
         rChunk.streetNo = _street.CountNo;
 
@@ -374,7 +374,7 @@ public class MapGen2 : MonoBehaviour
         var newPos = rChunk.End.position;
         rChunk.transform.position += newPos - oldPos;
 
-        float realRoadScale = checkForwardRoadChunk(rChunk, roadscale);
+        float realRoadScale = CheckForwardRoadChunk(rChunk, roadscale);
 
         if (realRoadScale == 0 || realRoadScale >= roadscale)
         {
@@ -414,7 +414,7 @@ public class MapGen2 : MonoBehaviour
 
         GenerateRoad(_pos, _rot, rt, _street, _toLeft, _possibleCorner, _size, _loneRoad, 0.2f);
 
-        if (checkDistance(_pos, _rot * Quaternion.Euler(0, 0, -90) * Vector3.up, 9) == false)
+        if (CheckDistance(_pos, _rot * Quaternion.Euler(0, 0, -90) * Vector3.up, 9) == false)
         {
             return;
         }
@@ -446,12 +446,11 @@ public class MapGen2 : MonoBehaviour
         if(isLeft || isRight)
         {
             rChunk.GeneratedStreets.Add(Tuple.Create(rChunk.End.position, _newStreet));
-            int a = 0;
         }
 
     }
 
-    private float checkForwardRoadChunk(roadChunk _roadChunk, float _roadscale, Street _street = null)
+    private float CheckForwardRoadChunk(roadChunk _roadChunk, float _roadscale, Street _street = null)
     {
         var hit = Physics2D.Raycast((_roadChunk.Begin.position), _roadChunk.End.up);
         var hitDistance = hit.distance;
@@ -466,8 +465,8 @@ public class MapGen2 : MonoBehaviour
         }
         if (hitDistance != 0 && (hitDistance / roadUnit) < _roadscale && hit.collider.gameObject.tag == "road")
         {
-            _roadChunk.ended = "";
-            hit.collider.gameObject.GetComponent<roadChunk>().ended = "";
+            //_roadChunk.ended = "";
+            //hit.collider.gameObject.GetComponent<roadChunk>().ended = "";
             Vector3 pointOfHit = hit.point;
             _roadChunk.GeneratedStreets.Add(Tuple.Create(pointOfHit, spawnedStreets[hit.collider.gameObject.GetComponent<roadChunk>().streetNo]));
             hit.collider.gameObject.GetComponent<roadChunk>().GeneratedStreets.Add(Tuple.Create(pointOfHit, spawnedStreets[_roadChunk.streetNo]));
@@ -475,7 +474,7 @@ public class MapGen2 : MonoBehaviour
         return hitDistance / roadUnit;
     }
 
-    private bool checkDistance(Vector3 _pos, Vector3 _dir, float magn = 10000000f)
+    private bool CheckDistance(Vector3 _pos, Vector3 _dir, float magn = 10000000f)
     {
         var hit = Physics2D.Raycast(_pos, _dir);
         if (hit.distance == 0 || hit.distance >= magn * 7 / 8)
@@ -621,7 +620,7 @@ public class MapGen2 : MonoBehaviour
     }
 
 
-    private bool checkStartingPointsToThis(Vector3 point)
+    private bool CheckStartingPointsToThis(Vector3 point)
     {
         //int status = -1;
         double min_value = quarterDistance;
@@ -636,7 +635,7 @@ public class MapGen2 : MonoBehaviour
         return false;
     }
 
-    private int checkStartingPoints(Vector3 point)
+    private int CheckStartingPoints(Vector3 point)
     {
         int status = -1;
         double min_value = 0;
@@ -650,7 +649,7 @@ public class MapGen2 : MonoBehaviour
         return status;
     }
 
-    private StartPointClass2 findNearestStartingPoint(Vector3 point, bool _withNoKind = false)
+    private StartPointClass2 FindNearestStartingPoint(Vector3 point, bool _withNoKind = false)
     {
         double min_value = quarterDistance;
         StartPointClass2 returnPoint = startingPoints[0];
@@ -672,7 +671,7 @@ public class MapGen2 : MonoBehaviour
     }
 
 
-    private void createCustomMapSimpleUnit(Vector3 _pos1, Vector3 _pos2, MapSimpleUnits _mapUnit, float _width = 1f, float _unitHeight = 1f)
+    private void CreateCustomMapSimpleUnit(Vector3 _pos1, Vector3 _pos2, MapSimpleUnits _mapUnit, float _width = 1f, float _unitHeight = 1f)
     {
         var newChunk = _mapUnit;
         float length = (_mapUnit.Begin.position - _mapUnit.End.position).magnitude;
@@ -691,36 +690,36 @@ public class MapGen2 : MonoBehaviour
             rChunk.transform.localScale.y * (((_pos1 - _pos2).magnitude / length) / _unitHeight),
             rChunk.transform.localScale.z);
     }
-    void CreateDistricts()
-    {
-        StartCoroutine(AnotherStreetDistr());
-    }
+    //void CreateDistricts()
+    //{
+    //    StartCoroutine(AnotherStreetDistr());
+    //}
 
-    private IEnumerator AnotherStreetDistr()
-    {
+    //private IEnumerator AnotherStreetDistr()
+    //{
         
-        foreach (var spawnedStreet in spawnedStreets)
-        {
-            yield return new WaitForSecondsRealtime(0.01f);
-            foreach (roadChunk road in spawnedStreet.RoadChunks)
-            {
+    //    foreach (var spawnedStreet in spawnedStreets)
+    //    {
+    //        yield return new WaitForSecondsRealtime(0.01f);
+    //        foreach (roadChunk road in spawnedStreet.RoadChunks)
+    //        {
 
-                DistrictObject district = new DistrictObject();
-                var hit = Physics2D.Raycast(road.Begin.position, road.Left.rotation * Vector3.up, 24 * roadUnit);
-                var hit2 = Physics2D.Raycast(road.End.position, road.Left.rotation * Vector3.up, 24 * roadUnit);
+    //            DistrictObject district = new DistrictObject();
+    //            var hit = Physics2D.Raycast(road.Begin.position, road.Left.rotation * Vector3.up, 24 * roadUnit);
+    //            var hit2 = Physics2D.Raycast(road.End.position, road.Left.rotation * Vector3.up, 24 * roadUnit);
 
-                //var hit = Physics.Raycast(road.Left.position, road.Left.rotation * Quaternion.Euler(0, 0, -90) * Vector3.up, 6 * roadUnit);
-                if (hit && hit2)
-                    district.setDistrict(road.Begin.position, road.End.position, hit.point, hit2.point, true, 24 * roadUnit);
-                DistrictObject district2 = new DistrictObject();
-                hit = Physics2D.Raycast(road.Begin.position, road.Right.rotation * Vector3.up);
-                hit2 = Physics2D.Raycast(road.End.position, road.Right.rotation * Vector3.up);
-                if (checkDistance(hit.point, hit2.point))
-                    if (hit && hit2)
-                        district2.setDistrict(road.Begin.position, road.End.position, hit.point, hit2.point, false, 24 * roadUnit);
-            }
-        }
-    }
+    //            //var hit = Physics.Raycast(road.Left.position, road.Left.rotation * Quaternion.Euler(0, 0, -90) * Vector3.up, 6 * roadUnit);
+    //            if (hit && hit2)
+    //                district.setDistrict(road.Begin.position, road.End.position, hit.point, hit2.point, true, 24 * roadUnit);
+    //            DistrictObject district2 = new DistrictObject();
+    //            hit = Physics2D.Raycast(road.Begin.position, road.Right.rotation * Vector3.up);
+    //            hit2 = Physics2D.Raycast(road.End.position, road.Right.rotation * Vector3.up);
+    //            if (checkDistance(hit.point, hit2.point))
+    //                if (hit && hit2)
+    //                    district2.setDistrict(road.Begin.position, road.End.position, hit.point, hit2.point, false, 24 * roadUnit);
+    //        }
+    //    }
+    //}
     void CreateTestDistricts()
     {
         StartCoroutine(AnotherStreetTestDistr());
@@ -735,23 +734,15 @@ public class MapGen2 : MonoBehaviour
         {
             foreach (roadChunk road in spawnedStreet.RoadChunks)
             {
-                districtTest distObject2 = districtTest;
                 float maxDistance = 40 * roadUnit;
                 
                 //DistrictObject district = new DistrictObject();
-                var hit11 = Physics2D.Raycast(road.transform.position, road.Left.rotation * Vector3.up, maxDistance);
-                var hit12 = Physics2D.Raycast(road.End.position, road.Left.rotation * Vector3.up, maxDistance);
-                var hit13 = Physics2D.Raycast(road.Begin.position, road.Left.rotation * Vector3.up, maxDistance);
-                RaycastHit2D hit = hit13;
-
-                if (hit11.distance > hit12.distance && hit11.distance > hit13.distance) hit = hit11;
-                else if (hit12.distance > hit11.distance && hit12.distance > hit13.distance) hit = hit12;
-
-                int kind = 100;
-                if (hit)
+                var hit1 = Physics2D.Raycast(road.transform.position, road.Left.rotation * Vector3.up, maxDistance);
+                int kind = 500;
+                if (hit1)
                 {
-                    float maxMagn = hit.distance;
-                    if (hit.collider.tag == "river") { kind = 0; }
+                    float maxMagn = hit1.distance;
+                    if (hit1.collider.CompareTag("river")) { kind = 0; }
                     else if (maxMagn <= 3 * roadUnit) { kind = 1; }
                     else if (maxMagn <= maxDistance / 3) { kind = 2; }
                     else if (maxMagn <= maxDistance * 2 / 3) { kind = 3; }
@@ -761,22 +752,17 @@ public class MapGen2 : MonoBehaviour
                     var hitLeftBegin = Physics2D.Raycast(road.LeftOut.position, road.Begin.rotation * Vector3.up, maxDistance / 2);
                     if (hitLeftEnd) { distObj.Add(Tuple.Create(kind, road.LeftOut.position, hitLeftEnd.point)); }
                     if (hitLeftBegin) { distObj.Add(Tuple.Create(kind, road.LeftOut.position, hitLeftBegin.point)); }
-                    distObj.Add(Tuple.Create(kind, road.LeftOut.position, hit.point));
+                    distObj.Add(Tuple.Create(kind, road.LeftOut.position, hit1.point));
 
                     //createCustomMapSimpleUnit(road.transform.position, hit.point, distObject);
                 }
 
-                var hit21 = Physics2D.Raycast(road.transform.position, road.Right.rotation * Vector3.up, maxDistance);
-                var hit22 = Physics2D.Raycast(road.End.position, road.Right.rotation * Vector3.up, maxDistance);
-                var hit23 = Physics2D.Raycast(road.Begin.position, road.Right.rotation * Vector3.up, maxDistance);
-                RaycastHit2D hit2 = hit23;
+                var hit2 = Physics2D.Raycast(road.transform.position, road.Right.rotation * Vector3.up, maxDistance);
 
-                if (hit21.distance > hit22.distance && hit21.distance > hit23.distance) hit2 = hit21;
-                else if (hit22.distance > hit21.distance && hit22.distance > hit23.distance) hit2 = hit22;
                 if (hit2)
                 {
                     float maxMagn = hit2.distance;
-                    if (hit2.collider.tag == "river") { kind = 0; }
+                    if (hit2.collider.CompareTag("river")) { kind = 0; }
                     else if (maxMagn <= 1 * roadUnit) { kind = 1; }
                     else if (maxMagn <= maxDistance / 3) { kind = 2; }
                     else if (maxMagn <= maxDistance * 2 / 3) { kind = 3; }
@@ -793,13 +779,16 @@ public class MapGen2 : MonoBehaviour
             }
         }
 
+        int i = 0;
         yield return new WaitForSecondsRealtime(0.01f);
         foreach (var dist in distObj)
         {
+            if (i > 100){ i = 0; yield return new WaitForSecondsRealtime(0.03f); }
             districtTest distObject = districtTest;
             distObject.kind = dist.Item1;
             distList.Add(distObject);
-            createCustomMapSimpleUnit(dist.Item2, dist.Item3, distObject);
+            CreateCustomMapSimpleUnit(dist.Item2, dist.Item3, distObject);
+            i++;
         }
 
     }

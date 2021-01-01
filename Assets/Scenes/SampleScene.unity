@@ -526,7 +526,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6ec594681b203b4c8ac138dac062da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapSpawnCounter: 16
+  MapSpawnCounter: 1
   seaMesh: {fileID: 0}
   buildingChunks:
   - {fileID: 3281696147462704510, guid: ab2a02ea01746b44fa6da5aa63c33c5f, type: 3}
